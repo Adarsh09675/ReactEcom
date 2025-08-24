@@ -4,18 +4,22 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
+                // Clone your GitHub repository
                 git branch: 'main', url: 'https://github.com/Adarsh09675/ReactEcom.git'
             }
         }
 
         stage('Deploy & Build on Server') {
             steps {
-                sshagent(['deploy-key']) {   // make sure this ID matches Jenkins credentials
+                // Use the SSH credentials added in Jenkins (ID: deploy-key)
+                sshagent(['deploy-key']) {
                     sh '''
-                    DEPLOY_SERVER=ubuntu@52.62.158.15   # replace with your EC2 public IP
+                    # Set Deployment server variable
+                    DEPLOY_SERVER=ubuntu@52.62.158.15   # Replace with your deployment EC2 IP
 
                     echo "🚀 Syncing project to deployment server..."
-                    rsync -avz --exclude node_modules --exclude .git ./ $DEPLOY_SERVER:/home/ubuntu/react-app/
+                    # Rsync with SSH option to skip host key verification
+                    rsync -avz -e "ssh -o StrictHostKeyChecking=no" --exclude node_modules --exclude .git ./ $DEPLOY_SERVER:/home/ubuntu/react-app/
 
                     echo "📦 Building React app on server..."
                     ssh -o StrictHostKeyChecking=no $DEPLOY_SERVER << 'EOF'
@@ -32,4 +36,3 @@ pipeline {
         }
     }
 }
-
