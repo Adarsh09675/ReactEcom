@@ -45,7 +45,7 @@ const AboutPage = () => {
             <div className="card h-100">
               <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
               <div className="card-body">
-                <h5 className="card-title text-center">Jewelery</h5>
+                <h5 className="card-title text-center">khajana</h5>
               </div>
             </div>
           </div>
