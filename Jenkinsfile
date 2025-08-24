@@ -44,8 +44,6 @@ pipeline {
                         sudo cp -r build/* /var/www/html/
 
                         echo "✅ Deployment completed!"
-                    EOF
-                    '''
                 }
             }
         }
