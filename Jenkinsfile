@@ -23,28 +23,29 @@ pipeline {
                     rsync -avz -e "ssh -o StrictHostKeyChecking=no" --exclude node_modules --exclude .git ./ $DEPLOY_SERVER:$APP_DIR
 
                     echo "📦 Building React app on deployment server..."
-                    ssh -o StrictHostKeyChecking=no $DEPLOY_SERVER << 'EOF'
-                        set -e  # Stop on errors
+                    ssh -o StrictHostKeyChecking=no $DEPLOY_SERVER "
+                        set -e
                         cd ~/react-app
 
                         # Only install dependencies if package.json changed
-                        if [ ! -d "node_modules" ] || [ package.json -nt node_modules/.package_stamp ]; then
-                            echo "🔧 Installing npm dependencies..."
+                        if [ ! -d 'node_modules' ] || [ package.json -nt node_modules/.package_stamp ]; then
+                            echo '🔧 Installing npm dependencies...'
                             npm install
+                            mkdir -p node_modules
                             touch node_modules/.package_stamp
                         else
-                            echo "✅ Dependencies already installed, skipping npm install"
+                            echo '✅ Dependencies already installed, skipping npm install'
                         fi
 
-                        echo "🏗️ Running build..."
+                        echo '🏗️ Running build...'
                         npm run build
 
-                        echo "📂 Deploying to Nginx directory..."
-                        sudo rm -rf /var/www/html/*
-                        sudo cp -r build/* /var/www/html/
+                        echo '📂 Deploying to Nginx directory...'
+                        sudo rm -rf $NGINX_DIR/*
+                        sudo cp -r build/* $NGINX_DIR/
 
-                        echo "✅ Deployment completed!"
-                    EOF
+                        echo '✅ Deployment completed!'
+                    "
                     '''
                 }
             }
