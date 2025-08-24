@@ -1,38 +1,62 @@
 pipeline {
     agent any
 
+    environment {
+        DEPLOY_SERVER = "ubuntu@52.62.158.15" // Deployment EC2 IP
+        APP_DIR = "/home/ubuntu/react-app"
+        NGINX_DIR = "/var/www/html"
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
-                // Clone your GitHub repository
+                echo "📥 Cloning GitHub repository..."
                 git branch: 'main', url: 'https://github.com/Adarsh09675/ReactEcom.git'
             }
         }
 
-        stage('Deploy & Build on Server') {
+        stage('Sync & Deploy') {
             steps {
-                // Use the SSH credentials added in Jenkins (ID: deploy-key)
                 sshagent(['deploy-key']) {
                     sh '''
-                    # Set Deployment server variable
-                    DEPLOY_SERVER=ubuntu@52.62.158.15   # Replace with your deployment EC2 IP
-
                     echo "🚀 Syncing project to deployment server..."
-                    # Rsync with SSH option to skip host key verification
-                    rsync -avz -e "ssh -o StrictHostKeyChecking=no" --exclude node_modules --exclude .git ./ $DEPLOY_SERVER:/home/ubuntu/react-app/
+                    rsync -avz -e "ssh -o StrictHostKeyChecking=no" --exclude node_modules --exclude .git ./ $DEPLOY_SERVER:$APP_DIR
 
-                    echo "📦 Building React app on server..."
+                    echo "📦 Building React app on deployment server..."
                     ssh -o StrictHostKeyChecking=no $DEPLOY_SERVER << 'EOF'
-                      cd ~/react-app
-                      npm install
-                      npm run build
-                      sudo rm -rf /var/www/html/*
-                      sudo cp -r build/* /var/www/html/
-                      echo "✅ Deployment completed!"
+                        set -e  # Stop on errors
+                        cd ~/react-app
+
+                        # Only install dependencies if package.json changed
+                        if [ ! -d "node_modules" ] || [ package.json -nt node_modules/.package_stamp ]; then
+                            echo "🔧 Installing npm dependencies..."
+                            npm install
+                            touch node_modules/.package_stamp
+                        else
+                            echo "✅ Dependencies already installed, skipping npm install"
+                        fi
+
+                        echo "🏗️ Running build..."
+                        npm run build
+
+                        echo "📂 Deploying to Nginx directory..."
+                        sudo rm -rf /var/www/html/*
+                        sudo cp -r build/* /var/www/html/
+
+                        echo "✅ Deployment completed!"
                     EOF
                     '''
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "🎉 Pipeline finished successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Check logs!"
         }
     }
 }
