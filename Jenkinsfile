@@ -30,24 +30,14 @@ pipeline {
             steps {
                 sshagent(['deploy-key']) {
                     sh '''
-                    echo "🚀 Syncing project to deployment server..."
-                    rsync -avz -e "ssh -o StrictHostKeyChecking=no" --exclude node_modules --exclude .git ./ $DEPLOY_SERVER:$APP_DIR
+                    echo "🚀 Copying build folder to deployment server..."
+                    rsync -avz -e "ssh -o StrictHostKeyChecking=no" build/ $DEPLOY_SERVER:$APP_DIR/build
 
                     ssh -o StrictHostKeyChecking=no $DEPLOY_SERVER << 'EOF'
                     set -e
-                    cd ~/react-app
-                    if [ ! -d "node_modules" ] || [ package.json -nt node_modules/.package_stamp ]; then
-                        echo "Installing npm dependencies..."
-                        npm install
-                        touch node_modules/.package_stamp
-                    else
-                        echo "Dependencies already installed, skipping npm install"
-                    fi
-                    echo "Building React app..."
-                    npm run build
-                    echo "Deploying to Nginx directory..."
+                    echo "Deploying build folder to Nginx directory..."
                     sudo rm -rf /var/www/html/*
-                    sudo cp -r build/* /var/www/html/
+                    sudo cp -r $APP_DIR/build/* /var/www/html/
                     echo "✅ Deployment to EC2 + Nginx completed!"
                     EOF
                     '''
