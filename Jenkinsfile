@@ -7,12 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Adarsh09675/ReactEcom.git'
-            }
-        }
-
         stage('Build Frontend') {
             steps {
                 sh 'npm install'
