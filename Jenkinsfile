@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_SERVER = "ubuntu@13.239.133.122"
+        DEPLOY_SERVER = "ubuntu@13.239.25.175"
         APP_PATH = "/var/www/react_app"
         NPM_CACHE = "$WORKSPACE/.npm_cache"   // Workspace-specific npm cache for faster builds
     }
