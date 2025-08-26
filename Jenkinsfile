@@ -2,27 +2,44 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_SERVER = "ubuntu@3.107.23.97"
+        DEPLOY_SERVER = "ubuntu@3.106.166.97"
         APP_PATH = "/var/www/react_app"
     }
 
     stages {
-        stage('Build Frontend') {
+        stage('Checkout') {
+            steps {
+                git url: 'git@github.com:Adarsh09675/ReactEcom.git', credentialsId: 'Ecom-credential'
+            }
+        }
+
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
+            }
+        }
+
+        stage('Build React App') {
+            steps {
                 sh 'npm run build'
             }
         }
 
         stage('Deploy to Server') {
             steps {
-                sshagent(credentials: ['ec2-ssh-key']) {
-                    sh """
-                        # Deploy build files to deployment server
-                        rsync -avz --delete build/ $DEPLOY_SERVER:$APP_PATH/
-                    """
-                }
+                sh """
+                    rsync -avz --delete build/ $DEPLOY_SERVER:$APP_PATH
+                """
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment Successful!"
+        }
+        failure {
+            echo "Deployment Failed!"
         }
     }
 }
