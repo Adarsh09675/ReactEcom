@@ -9,7 +9,10 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'git@github.com:Adarsh09675/ReactEcom.git', credentialsId: 'Ecom-credential'
+                // Explicitly specify the main branch
+                git branch: 'main', 
+                    url: 'git@github.com:Adarsh09675/ReactEcom.git', 
+                    credentialsId: 'Ecom-credential'
             }
         }
 
@@ -27,7 +30,9 @@ pipeline {
 
         stage('Deploy to Server') {
             steps {
+                // Ensure the deployment folder exists
                 sh """
+                    ssh $DEPLOY_SERVER 'mkdir -p $APP_PATH'
                     rsync -avz --delete build/ $DEPLOY_SERVER:$APP_PATH
                 """
             }
