@@ -45,7 +45,7 @@ pipeline {
 
         stage('Deploy to Server') {
             steps {
-                sshagent(['DEPLOY_SERVER_SSH']) {
+                sshagent(['Ecom-credential']) {
                     sh '''
                         rsync -az --delete build/ $DEPLOY_SERVER:$APP_PATH
                         ssh $DEPLOY_SERVER "sudo systemctl restart nginx"
