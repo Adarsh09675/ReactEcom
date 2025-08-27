@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEPLOY_SERVER = "ubuntu@3.25.169.192"
         APP_PATH = "/var/www/react_app"
-        NPM_CACHE = "$WORKSPACE/.npm_cache"
+        NPM_CACHE = "${WORKSPACE}/.npm_cache"   // safer interpolation
     }
 
     options {
@@ -24,17 +24,17 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo "📦 Installing dependencies efficiently"
-                sh """
-                    mkdir -p $NPM_CACHE
-                    npm ci --cache $NPM_CACHE --prefer-offline --jobs=$(nproc) --silent --no-progress
-                """
+                sh '''
+                    mkdir -p "$NPM_CACHE"
+                    npm ci --cache "$NPM_CACHE" --prefer-offline --jobs=$(nproc) --silent --no-progress
+                '''
             }
         }
 
         stage('Build React App') {
             steps {
                 echo "⚡ Building React app"
-                sh "npm run build"
+                sh 'npm run build'
                 script {
                     if (!fileExists("build/index.html")) {
                         error "❌ Build failed! build/index.html not found."
@@ -46,10 +46,10 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 sshagent(['DEPLOY_SERVER_SSH']) {
-                    sh """
+                    sh '''
                         rsync -az --delete build/ $DEPLOY_SERVER:$APP_PATH
-                        ssh $DEPLOY_SERVER 'sudo systemctl restart nginx'
-                    """
+                        ssh $DEPLOY_SERVER "sudo systemctl restart nginx"
+                    '''
                 }
             }
         }
@@ -64,4 +64,3 @@ pipeline {
         }
     }
 }
-
