@@ -90,7 +90,7 @@ const Products = () => {
             className="btn btn-outline-dark btn-sm m-2"
             onClick={() => filterProduct("jewelery")}
           >
-            Jewelery
+            Jewellery
           </button>
           <button
             className="btn btn-outline-dark btn-sm m-2"

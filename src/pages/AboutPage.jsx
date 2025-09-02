@@ -20,7 +20,7 @@ const AboutPage = () => {
           quo saepe dolorem optio minus sint nemo totam dolorum! Reprehenderit
           delectus expedita a alias nam recusandae illo debitis repellat libero,
           quasi explicabo molestiae saepe, dolorem tempore itaque eveniet quam
-          dignissimos This is  a sample project about for running cicd pipeline.
+          dignissimos.
         </p>
 
         <h2 className="text-center py-4">Our Products</h2>
@@ -37,7 +37,7 @@ const AboutPage = () => {
             <div className="card h-100">
               <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
               <div className="card-body">
-                <h5 className="card-title text-center">girls section</h5>
+                <h5 className="card-title text-center">Women's section</h5>
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@ const AboutPage = () => {
             <div className="card h-100">
               <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
               <div className="card-body">
-                <h5 className="card-title text-center">khajana</h5>
+                <h5 className="card-title text-center">Jewellery</h5>
               </div>
             </div>
           </div>
